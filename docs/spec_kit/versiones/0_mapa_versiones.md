@@ -45,10 +45,17 @@ fechas de verdad (`DATE`, no texto), un valor numérico con decimales
 proyecto en curso no la tiene). Eso hace que el 422 por tipo equivocado sea
 demostrable con tres casos distintos, no con uno.
 
-Arranca **vacía**: el Excel de referencia no trae proyectos. Eso da un
-smoke test que recorre el ciclo completo desde el estado inicial —**204 →
-crear → total 1 → borrar → 204 otra vez**— y ejercita el 204 del listado
-vacío.
+El Excel de referencia **no trae proyectos**: lo único que aporta son los
+valores admitidos de `tipo_financiacion` y `tipo_fondos`. Así que arranca
+con **14 filas de ejemplo, inventadas y anunciadas como tales**, que sí
+respetan esos seis valores al pie de la letra; cinco van con `fecha_fin`
+en `NULL` para que se vea en pantalla cuál es la única columna opcional.
+
+El smoke test recorre el ciclo sobre esos datos —**listar → crear → total
+15 → borrar → total 14**— y compara contra la pantalla lo que la API
+devolvió. Lo que se perdió al sembrar está dicho en `4_research.md`
+D-v1-9: el **204 del listado vacío** sigue en el contrato pero ya no se ve
+al arrancar.
 
 Las demás tablas de la v1 son **ese mismo patrón** con otros nombres. El
 equipo que tome este ejemplo lo revisa, y **si está de acuerdo lo retoma y

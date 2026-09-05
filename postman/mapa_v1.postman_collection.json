@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Mapa de Conocimiento (Python) — v1 (proyecto)",
-    "description": "Los 7 endpoints de la v1, en el orden del smoke test. La tabla arranca VACÍA.",
+    "description": "Los 7 endpoints de la v1, en el orden del smoke test. La tabla arranca con 14 filas: 14 filas de ejemplo, inventadas y anunciadas como tales.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -43,7 +43,7 @@
             "proyecto"
           ]
         },
-        "description": "Con la base recién levantada responde 204 SIN cuerpo. No es un error."
+        "description": "Responde 200 con total: 14: el init.sql siembra la tabla con datos de EJEMPLO. Con el listado VACÍO responde 204 SIN cuerpo, que no es un error — pero ya no se llega ahí arrancando."
       }
     },
     {

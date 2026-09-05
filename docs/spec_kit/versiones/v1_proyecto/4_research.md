@@ -164,7 +164,7 @@ las respuestas de escritura—, y eso solo se descubrió al escribir la
 primera clase de petición: era imposible cumplir las dos a la vez.
 **Estado:** vigente.
 
-## D-v1-9 — La v1 se construye sobre una tabla vacía
+## D-v1-9 — La v1 se construye sobre `proyecto` (revisada: ya no arranca vacía)
 
 **Contexto.** De las ocho tablas sin clave foránea, `proyecto` es la de más
 campos (seis) — pero el Excel de referencia **no trae un solo proyecto**.
@@ -187,5 +187,31 @@ campos, aunque arranque vacía.
 **Consecuencias.** No hay una cifra de catálogo que verificar, así que el
 criterio 2 comprueba el **204** en vez de un total. Y el ejemplo demuestra
 algo que el otro no puede: que el sistema funciona **antes** de tener
-datos. **Estado:** vigente.
+datos. **Estado:** ~~vigente~~ — ver la revisión de abajo.
+
+**Revisión (2026-09-05): la tabla ya no arranca vacía.** Se sembró `proyecto`
+con 14 filas. La decisión de construir la v1 sobre esta tabla —el punto
+(b)— **sigue en pie**; lo que se cayó es la razón 2, y conviene decir por
+qué se cayó:
+
+> La razón 2 sigue siendo **cierta de hecho**: la hoja `proyecto` del Excel
+> no trae ni un proyecto. Lo único que aporta son los valores admitidos de
+> `tipo_financiacion` y `tipo_fondos`. Lo que cambió no es el dato, es la
+> decisión: se prefirió **sembrar catorce filas de ejemplo, anunciadas como
+> inventadas**, antes que dejar la v1 sin nada que mirar en pantalla.
+
+**Lo que cuesta la revisión, dicho sin adornos.** El **204 del listado
+vacío** era el desenlace que este ejemplo ejercitaba y ningún otro podía; con
+la tabla sembrada deja de verse al arrancar. Sigue en el contrato, el front
+lo sigue tratando como «todavía no hay» y el smoke test lo sigue aceptando,
+pero **quien quiera verlo tiene que provocarlo**: comentar el bloque
+`INSERT` de `db/init.sql`, `docker compose down -v` y volver a levantar.
+Eso es una instrucción de dos líneas, no una demostración que ocurre sola,
+y esa diferencia es real.
+
+**A cambio**, el ejemplo gana lo que antes no tenía: una pantalla con filas.
+Un listado vacío no muestra si la tabla pinta bien sus columnas, si el
+`limite` recorta de verdad, si un texto largo rompe el diseño, ni si la
+fecha opcional se ve distinta de una obligatoria. Todo eso solo aparece
+cuando hay datos, y era lo que faltaba. **Estado:** vigente, revisada.
 

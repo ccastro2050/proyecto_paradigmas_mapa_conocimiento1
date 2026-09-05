@@ -42,7 +42,10 @@ verificado**.
 `GET /api/proyecto` → 200 con el sobre `{tabla, limite, total, datos:[…]}`.
 - Devuelve **solo los activos**.
 - `limite` opcional (entero > 0; por defecto 1000).
-- Sin filas activas → **204** sin cuerpo. **Es el estado inicial.**
+- Sin filas activas → **204** sin cuerpo. Sigue en el contrato, pero
+  **ya no es el estado inicial**: la tabla arranca con 14 filas
+  (§3 de [5_data_model.md](5_data_model.md)). Para ver el 204 hay que
+  vaciarla a propósito.
 
 ### RF2 — Obtener por código
 `GET /api/proyecto/{id}` → 200. Inexistente **o inactivo** → 404.
@@ -76,28 +79,28 @@ Solo se modifican los campos enviados. Cuerpo vacío → 400.
 
 ## 5. Criterios de aceptación
 
-1. **Un solo comando.** `docker compose up -d --build` deja corriendo SQL
-   Server —con la base y sus 21 tablas— y la API.
+1. **Un solo comando.** `docker compose up -d --build` deja corriendo PostgreSQL —con la base y sus 21 tablas— y la API.
    `GET http://localhost:8031/` responde `"version":"v1"`.
-2. **El sistema arranca vacío.** `GET /api/proyecto` responde **204**.
+2. **El sistema arranca CON DATOS.** `GET /api/proyecto` responde **200**
+   con `total: 14`.
 3. **Crear y listar.** Un `POST` válido responde 200; después,
-   `GET /api/proyecto` responde **200 con `total: 1`**, y el presupuesto
+   `GET /api/proyecto` responde **200 con `total: 15`**, y el presupuesto
    vuelve como **número**, no como texto.
 4. **Ciclo de los cinco verbos.** `POST` crea el código `9001` → `PUT` lo
    reemplaza → `PATCH` le cambia solo `presupuesto` → `GET` lo confirma →
    `DELETE` lo desactiva, y un **segundo** `DELETE` responde **404**.
    Además, un `PUT` sin `tipoFondos` responde **422** mientras el **mismo
    cuerpo** por `PATCH` responde **200**.
-5. **El borrado es lógico, y se verifica.** Tras el `DELETE` el listado
-   vuelve a **204**, **y la fila sigue en la base** con `activo = FALSE`.
+5. **El borrado es lógico, y se verifica.** Tras el `DELETE` el `total` del listado
+   **baja en uno** —vuelve a 14—, **y la fila sigue en la base** con
+   `activo = FALSE`.
 6. **La validación es la frontera, y los tipos también son regla.** Tres
    casos distintos responden **422** sin tocar la base: falta
    `tipoFondos`; `presupuesto` llega como texto (`"mucho"`); `fechaInicio`
    llega como algo que no es una fecha (`"ayer"`). Y un código duplicado
    responde **500**.
 7. **Prueba de capas.** El proyecto `pruebas/` ejecuta el servicio con un
-   **repositorio de mentiras** y todas sus verificaciones pasan **con SQL
-   Server apagado**.
+   **repositorio de mentiras** y todas sus verificaciones pasan **con PostgreSQL apagado**.
 
 ## 6. Clarificaciones
 
@@ -111,7 +114,7 @@ Solo se modifican los campos enviados. Cuerpo vacío → 400.
 | C3 | `area_aplicacion.nombre` es `VARCHAR(60)` y su valor más largo tiene **129** | **Se agranda a `VARCHAR(150)`** | `db/init.sql` |
 | C4 | Ninguna tabla del módulo trae `activo` | **Se agrega `activo BOOLEAN NOT NULL DEFAULT TRUE`** a las 18 del módulo | Artículo 6 · RF6 |
 | C5 | El catálogo trae **"Cienias Naturales"** en 48 de las 218 filas | **Se corrige**: es un error de digitación de la fuente | `db/init.sql` |
-| C6 | `proyecto` arranca **sin una sola fila**: el Excel no trae proyectos | **No es un problema: es una ventaja.** El smoke test recorre el ciclo desde el estado inicial y ejercita el **204 del listado vacío**, que una tabla llena nunca deja probar | RF1 · criterios 2 y 5 |
+| C6 | La hoja `proyecto` del Excel no trae proyectos: solo los valores admitidos de `tipo_financiacion` y `tipo_fondos` | **Se siembran 14 filas de ejemplo, anunciadas como inventadas**, y esos seis valores admitidos **se respetan al pie de la letra**: las 14 no usan ningún otro. Cinco van con `fecha_fin` en `NULL` a propósito, para que se vea en pantalla que esa columna es la única opcional. El precio está dicho en `4_research` D-v1-9: el **204 del listado vacío** deja de verse al arrancar | `5_data_model` §3 · `db/init.sql` |
 | C7 | `fechaFin` admite nulos y `fechaInicio` no. ¿Se valida que la final sea posterior? | **No en la v1.** Un proyecto en curso no tiene fecha de fin —por eso es opcional—, y comparar las dos es una regla de negocio que nadie pidió. Aquí sí se podría, porque son `DATE` de verdad: queda anotado para la versión que la necesite | `5_data_model` §2 |
 | C8 | `presupuesto` es `FLOAT`. ¿Se acepta como texto en el JSON? | **No: llega como número o es 422.** El tipo también es regla, y aceptarlo como texto abriría la puerta a `"mucho"` | RF3 · criterio 6 |
 | C9 | Un registro inactivo, ¿se puede consultar por su código? | **No: responde 404.** Si el listado los filtra, individualmente tampoco existen | RF2 · RF6 |

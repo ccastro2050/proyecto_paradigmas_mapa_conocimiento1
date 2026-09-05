@@ -33,7 +33,7 @@
 docker compose up -d postgres
 docker compose exec postgres psql -U mapa -d mapa_local `
   -c "SELECT COUNT(*) FROM proyecto"
-#  → 0
+#  → 14
 ```
 
 ## Fase 2 — El esqueleto de la API
@@ -56,8 +56,8 @@ esquemas.
 
 ## Fase 4 — Las interfaces y el servicio
 
-- [ ] `IRepositorioAreaConocimiento` e `IServicioAreaConocimiento`.
-- [ ] `ServicioAreaConocimiento`, que lanza `ValueError` y `LookupError` —
+- [ ] `IRepositorioProyecto` e `IServicioProyecto`.
+- [ ] `ServicioProyecto`, que lanza `ValueError` y `LookupError` —
       **nunca códigos HTTP**.
 
 **Verificación:** la prueba de capas de la Fase 8 ya podría escribirse; el
@@ -65,7 +65,7 @@ servicio no importa nada de FastAPI.
 
 ## Fase 5 — El repositorio
 
-- [ ] `RepositorioAreaConocimientoPostgreSQL` con `text()` y `:parametro`.
+- [ ] `RepositorioProyectoPostgreSQL` con `text()` y `:parametro`.
 - [ ] **Todas** las consultas filtran por `activo = TRUE`.
 - [ ] El borrado lógico, en **una sola** consulta.
 - [ ] `ensamblador.py`.
@@ -73,8 +73,8 @@ servicio no importa nada de FastAPI.
 **Verificación:** desde el contenedor,
 
 ```powershell
-docker compose exec api-mapa python -c "import asyncio, os; from repositorios.repositorio_proyecto_postgresql import RepositorioAreaConocimientoPostgreSQL as R; print(len(asyncio.run(R(os.environ['DB_POSTGRES']).obtener_todos(1000))))"
-#  → 0
+docker compose exec api-mapa python -c "import asyncio, os; from repositorios.repositorio_proyecto_postgresql import RepositorioProyectoPostgreSQL as R; print(len(asyncio.run(R(os.environ['DB_POSTGRES']).obtener_todos(1000))))"
+#  → 14
 ```
 
 ## Fase 6 — El controlador

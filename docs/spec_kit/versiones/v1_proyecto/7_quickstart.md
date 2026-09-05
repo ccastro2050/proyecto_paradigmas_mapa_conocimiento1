@@ -28,15 +28,16 @@ Sin el `-v`, el usuario `sa` sigue con la clave vieja dentro del volumen.
 # 1. La API responde
 curl http://localhost:8031/
 
-# 2. El sistema arranca VACÍO
+# 2. El sistema arranca CON DATOS: el init.sql sembró la tabla
 curl -i http://localhost:8031/api/proyecto
-#    → 204, sin cuerpo
+#    → 200 con total: 154. El 204 sigue siendo la respuesta al listado
+#      VACÍO, pero ya no se llega ahí arrancando.
 
 # 3. Crear y listar
 curl -X POST http://localhost:8031/api/proyecto `
   -H "Content-Type: application/json" -d '{"id":9001,"titulo":"Mapa de conocimiento institucional","resumen":"Proyecto para consolidar la produccion academica de la universidad.","presupuesto":85000000.50,"tipoFinanciacion":"Interna","tipoFondos":"Recurrentes","fechaInicio":"2026-02-01T00:00:00","fechaFin":null}'
 curl http://localhost:8031/api/proyecto
-#    → total: 1, y presupuesto vuelve como NÚMERO
+#    → total: 15, y presupuesto vuelve como NÚMERO
 
 # 4. El ciclo de los cinco verbos
 curl -X PUT http://localhost:8031/api/proyecto/9001 `
@@ -55,13 +56,13 @@ curl -i -X PATCH http://localhost:8031/api/proyecto/9001 `
 
 # 5. El borrado es LÓGICO
 curl -X DELETE http://localhost:8031/api/proyecto/9001
-curl -i http://localhost:8031/api/proyecto        # → 204 otra vez
+curl -i http://localhost:8031/api/proyecto        # → 200 con total: 14 otra vez
 curl -i -X DELETE http://localhost:8031/api/proyecto/9001   # → 404
 
-docker compose exec postgres bash -c '/opt/mssql-tools18/bin/sqlcmd `
-  -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -d mapa_local `
-  -Q "SELECT id, activo FROM proyecto"'
-#    → 9001 | 0
+docker compose exec postgres `
+  psql -U mapa -d mapa_local `
+  -c "SELECT id, activo FROM proyecto WHERE id = 9001"
+#    → 9001 | f   ← sigue ahí, con activo en falso
 
 # 6. Los TRES casos de 422, que son la lección de esta versión
 curl -i -X POST http://localhost:8031/api/proyecto `

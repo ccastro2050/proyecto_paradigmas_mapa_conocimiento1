@@ -21,8 +21,10 @@
 -- Las 21 tablas se crean COMPLETAS aunque la v1 solo use una: la base
 -- es infraestructura dada. Lo que crece por versiones es la API.
 --
--- La tabla de la v1 es 'proyecto', y arranca VACÍA: el Excel de referencia
--- no trae sus filas, y rellenarlas sería inventar datos.
+-- La tabla de la v1 es 'proyecto', y arranca con 14 filas DE EJEMPLO. El
+-- Excel de referencia no trae ninguna, así que estas se inventaron: el
+-- comentario que va justo encima del INSERT lo dice, y lo dice ahí para
+-- que lo lea quien mire los datos, no solo quien lea esta cabecera.
 --
 -- PostgreSQL ejecuta este archivo SOLO en el primer arranque, cuando el
 -- volumen está vacío. Para volver a correrlo: docker compose down -v
@@ -559,10 +561,45 @@ INSERT INTO area_aplicacion (id, nombre) VALUES
     (20, 'Actividades de los hogares en calidad de empleadores'),
     (21, 'Actividades de organizaciones y entidades extraterritoriales');
 
+-- proyecto: 14 filas DE EJEMPLO. Ojo con esto.
+--
+-- Los tres catálogos de arriba salieron del Excel del módulo. Esta tabla NO:
+-- la hoja `proyecto` del Excel no trae ni un proyecto. Lo único que aporta
+-- son los valores admitidos de dos columnas —`tipo_financiacion` con
+-- 'interna', 'externa' y 'cofinanciado', y `tipo_fondos` con 'Público',
+-- 'Privado' y 'Mixto'—, y ESO SÍ se respeta al pie de la letra: las catorce
+-- filas usan solo esos seis valores.
+--
+-- El resto —títulos, resúmenes, presupuestos y fechas— está inventado, y se
+-- dice aquí porque un dato inventado que no se anuncia termina citado en un
+-- informe como si fuera del módulo. Ninguno de estos proyectos existe.
+--
+-- Cinco filas van con `fecha_fin` en NULL a propósito: son las que están en
+-- curso, y son las que hacen visible en pantalla que esa columna es LA ÚNICA
+-- opcional de la tabla. Con las catorce terminadas, nadie notaría la
+-- diferencia entre una columna opcional y una obligatoria.
+INSERT INTO proyecto (id, titulo, resumen, presupuesto, tipo_financiacion,
+                      tipo_fondos, fecha_inicio, fecha_fin) VALUES
+    (1001, 'Mapa de saberes locales en el oriente antioqueño', 'Levantamiento participativo del conocimiento tradicional de cuatro municipios, con miras a integrarlo a los currículos de pregrado.', 48000000, 'interna', 'Público', '2024-02-01', '2025-01-31'),
+    (1002, 'Analítica de datos para la deserción estudiantil', 'Modelo descriptivo que cruza matrícula, notas y apoyos económicos para identificar en qué semestre se pierde a los estudiantes y por qué.', 72500000, 'cofinanciado', 'Mixto', '2024-03-15', '2025-09-30'),
+    (1003, 'Energías limpias para sedes rurales', 'Diseño de un sistema solar de respaldo para tres sedes rurales y medición de su costo real frente al de la red convencional.', 130000000, 'externa', 'Privado', '2024-05-02', NULL),
+    (1004, 'Lectura crítica en la formación de maestros', 'Estudio de aula sobre cómo cambian las prácticas de lectura de los futuros licenciados cuando la evaluación deja de ser un cuestionario.', 21000000, 'interna', 'Público', '2023-08-01', '2024-12-15'),
+    (1005, 'Prototipo de riego inteligente para pequeños cultivos', 'Sensores de humedad y control por microcontrolador, pensado para predios de menos de dos hectáreas y presupuesto de familia campesina.', 56800000, 'cofinanciado', 'Mixto', '2024-07-01', NULL),
+    (1006, 'Memoria histórica del conflicto en el Caribe', 'Archivo oral con sobrevivientes y organizaciones sociales, y una guía para que otras universidades repitan el método sin revictimizar.', 94000000, 'externa', 'Público', '2023-11-06', '2025-05-30'),
+    (1007, 'Salud mental de estudiantes en primer semestre', 'Tamizaje y acompañamiento durante el primer año, con seguimiento de qué tanto el acompañamiento cambia la permanencia.', 38400000, 'interna', 'Público', '2024-01-22', '2024-11-29'),
+    (1008, 'Materiales de construcción a partir de residuos', 'Ensayos de resistencia de bloques fabricados con residuos de demolición, buscando una mezcla que cumpla la norma sismo resistente.', 112300000, 'externa', 'Privado', '2024-04-08', NULL),
+    (1009, 'Observatorio de innovación curricular', 'Seguimiento a las reformas de plan de estudios de los últimos diez años y a lo que efectivamente cambió en el aula después de firmarlas.', 29750000, 'interna', 'Público', '2024-09-02', NULL),
+    (1010, 'Turismo comunitario y patrimonio en el Quindío', 'Inventario del patrimonio material de seis veredas y formación de guías locales, con las comunidades como dueñas de los productos.', 67200000, 'cofinanciado', 'Mixto', '2023-06-12', '2024-10-31'),
+    (1011, 'Accesibilidad web en los servicios universitarios', 'Auditoría de los trámites en línea contra la norma de accesibilidad y corrección de los tres más usados por estudiantes con discapacidad.', 18900000, 'interna', 'Público', '2024-08-19', '2025-03-14'),
+    (1012, 'Cadena de valor del café de alta montaña', 'Costeo de la cadena desde el predio hasta la exportación, para establecer dónde se queda el margen que no llega al productor.', 85000000, 'externa', 'Privado', '2024-02-26', '2025-08-29'),
+    (1013, 'Formación docente en pensamiento computacional', 'Programa para maestros de básica que no vienen de áreas técnicas, con medición de lo que aprenden sus estudiantes al año siguiente.', 43600000, 'cofinanciado', 'Mixto', '2024-10-07', NULL),
+    (1014, 'Movilidad sostenible en el campus', 'Conteo de viajes, encuesta de origen y destino, y propuesta de rutas seguras para bicicleta entre las sedes y el sistema de transporte.', 25400000, 'interna', 'Público', '2023-09-04', '2024-08-30');
+
+
 -- ============================================================
 -- Conteos esperados:
 --   area_conocimiento                 218 filas
 --   objetivo_desarrollo_sostenible     17 filas
 --   area_aplicacion                    21 filas
---   proyecto                         0 filas (la v1 arranca con la tabla vacía)
+--   proyecto                           14 filas (DE EJEMPLO: el Excel no las trae)
 -- ============================================================

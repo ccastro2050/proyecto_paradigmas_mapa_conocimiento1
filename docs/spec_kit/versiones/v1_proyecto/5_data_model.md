@@ -42,19 +42,41 @@ por eso es la que mejor enseña que **el tipo también es regla**: un
 `"ayer"` son ambos **422**, y ninguno de los dos toca la base. Con una
 tabla de puro texto eso no se puede demostrar.
 
-## 3. Las semillas: ninguna, y a propósito
+## 3. Las semillas: 14 proyectos de ejemplo, con dos columnas que sí son del Excel
 
-**`proyecto` arranca vacía**: el Excel de referencia no trae proyectos, y
-no se inventan (C6).
+**`proyecto` arranca con 14 filas inventadas.** La hoja `proyecto` del
+Excel no trae ni un proyecto (C6). Pero **sí trae algo**, y eso se
+respetó al pie de la letra: los valores admitidos de dos columnas.
 
-Eso define el estado inicial y da forma al smoke test: el primer `GET`
-responde **204**, y el recorrido completo corre desde cero en cualquier
-máquina.
+| Columna | De dónde sale |
+|---|---|
+| `tipo_financiacion` | **Del Excel**: `interna`, `externa`, `cofinanciado`. Las 14 filas usan solo esos tres |
+| `tipo_fondos` | **Del Excel**: `Público`, `Privado`, `Mixto`. Las 14 filas usan solo esos tres |
+| `titulo`, `resumen`, `presupuesto`, `fecha_inicio`, `fecha_fin` | **Inventados.** Ninguno de estos proyectos existe |
 
-Los catálogos que **sí** vienen cargados, aunque la v1 no los nombre:
+### Las semillas están hechas para ejercitar los tipos
+
+Esta tabla es la que mejor enseña que **el tipo también es regla**, y las
+filas se eligieron para que eso se vea en pantalla y no solo en un 422:
+
+- **`presupuesto` vuelve como número**, no como texto entrecomillado. Con
+  valores de ocho y nueve cifras, un JSON que devolviera `"48000000"` se
+  nota a simple vista.
+- **Cinco de las catorce van con `fecha_fin` en `NULL`**: son las que
+  están en curso. Son las que hacen visible que esa columna es **la única
+  opcional** de la tabla. Con las catorce terminadas, nadie distinguiría
+  una columna opcional de una obligatoria mirando el listado.
+
+> **Y el aviso, donde se lee.** Que estos proyectos son inventados está
+> dicho **dentro de `db/init.sql`, encima del `INSERT`**, no solo aquí: un
+> dato inventado que no se anuncia termina citado en un informe como si
+> fuera del módulo.
+
+Los catálogos que además vienen cargados, aunque la v1 no los nombre:
 
 | Tabla | Filas |
 |---|---|
+| `proyecto` | **14** (de ejemplo) |
 | `area_conocimiento` | 218 |
 | `area_aplicacion` | 21 |
 | `objetivo_desarrollo_sostenible` | 17 |
