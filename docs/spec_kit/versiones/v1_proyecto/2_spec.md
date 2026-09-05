@@ -29,7 +29,9 @@ verificado**.
 - Ninguna otra tabla de las 21.
 - Los productos, los docentes y los puentes que cuelgan del proyecto: v2.
 - Autenticación, JWT, roles ni usuarios: v3.
-- Frontend, dashboard ni consultas multitabla: v4.
+- Dashboard ni consultas multitabla: eso es la v4.
+- Más pantallas que la de `proyecto`: las demás tablas llegan en la
+  v2, cada una con la suya.
 - **Reactivar** un registro inactivo.
 - Validar que `fechaFin` sea posterior a `fechaInicio`: es una regla de
   negocio que nadie ha pedido (C7).

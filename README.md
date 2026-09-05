@@ -28,6 +28,7 @@ docker compose up -d --build
 
 | Qué | Dónde |
 |---|---|
+| **La pantalla** — empiece por aquí | **http://localhost:8079** |
 | **API — documentación interactiva** | http://localhost:8031/docs |
 | Diagnóstico | http://localhost:8031/ |
 | Listado | http://localhost:8031/api/proyecto |
@@ -81,6 +82,12 @@ proyecto_paradigmas_mapa_conocimiento1/
 │   ├── repositorios/                   CAPA 3: datos — el SQL a mano
 │   │   └── abstracciones/                la interfaz que la capa 2 conoce
 │   └── pruebas/                        el servicio con un repositorio de mentiras
+├── front_flask/                        LA PANTALLA: Flask + Jinja2
+│   ├── app.py                          las vistas: ruta → pantalla
+│   ├── cliente_api.py                  lo ÚNICO que habla HTTP con la API
+│   ├── templates/                      el marco y las pantallas
+│   └── static/estilos.css              escritos a mano, sin CDN
+│
 ├── docs/spec_kit/                      LA FUENTE DE VERDAD (ver abajo)
 ├── postman/                            los endpoints listos para probar con clics
 ├── docker-compose.yml                  TODO el sistema declarado en un archivo

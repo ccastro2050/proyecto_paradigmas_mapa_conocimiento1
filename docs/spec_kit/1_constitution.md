@@ -28,6 +28,74 @@
 - Si el código hace algo que la spec no dice, sobra; si la spec pide algo
   que el código no hace, falta.
 
+## Artículo 1.1 — Una versión incluye SU FRONT
+
+**Cada versión entrega su parte de la API *y* su parte del front.** No hay una
+versión «de back» y otra «de front».
+
+> **La regla operativa: una versión NO está cerrada si la API responde y la
+> pantalla no.** Media versión no es una versión.
+
+### Por qué
+
+| | |
+|---|---|
+| **Lo terminado se le puede mostrar a alguien** | Una versión que solo trae endpoints se sustenta con la documentación de la API. Una que trae pantallas se le muestra a quien la pidió |
+| **El contrato se ejercita de inmediato** | Uno descubre que el JSON es incómodo **cuando le toca pintarlo**. Si el front llega tres versiones después, el contrato lleva tres versiones equivocado |
+| **No hay front de golpe al final** | Es el error que se paga caro: seis entidades de API esperando un front que nace con una sola |
+| **Es lo que pide el curso** | `0_METODOLOGIA.md` §2, textual: *«v1 — CRUD de las tablas sin FK del módulo — **API REST + Frontend funcionando**»* |
+
+Y lo que cuesta: **cada versión es el doble de grande** y cada compuerta revisa
+dos stacks. Se compensa recortando el alcance: esta v1 toma **una** tabla.
+
+### El front es un TERCER PROCESO
+
+**Flask + Jinja2**, en su propio proyecto y en su propio contenedor, hablando
+con la API **solo por HTTP**. Tres cosas que se comprueban, no que se prometen:
+
+1. Su `requirements.txt` trae **Flask y `requests`, y nada más**:
+   ni FastAPI, ni el driver de PostgreSQL.
+2. Su servicio en el compose **no depende de `postgres`**.
+3. Y la prueba: **apagando la API, la pantalla sigue en pie**, con su aviso y
+   **sin un solo dato**.
+
+### Podría compartir código con la API, y precisamente por eso no lo hace
+
+La API de este módulo está en **Python / FastAPI** y el front **también está
+en Python**. Están uno al lado del otro en el disco: bastaría un
+`sys.path.append("../api_mapa")` para importar sus modelos y sus servicios.
+Funcionaría.
+
+Y está prohibido, porque los dos dejarían de ser procesos independientes:
+renombrar un método adentro de la API rompería la pantalla **sin que nadie
+tocara el contrato**. Lo único que comparten es el JSON.
+
+> **Aquí la regla hay que sostenerla a pulso, y eso la hace mejor lección.**
+> Una separación que el compilador impide no enseña nada: se cumple sola. Una
+> que se podría romper con una línea y no se rompe es una decisión de
+> arquitectura, y hay que saber por qué se tomó.
+>
+> Lo que sí es verificable, y se verifica: el front **no tiene** el driver de
+> PostgreSQL en su imagen, su servicio **no depende** de la base en el
+> compose, y con la API apagada la pantalla queda en pie **sin un solo dato**.
+>
+> El front trabaja con **diccionarios**, no con los modelos de la API: lo que
+> llega es lo que el JSON traía, ni más ni menos.
+
+### La pantalla habla el idioma del usuario
+
+Ni verbos HTTP, ni códigos de estado, ni nombres de tabla. Los dos botones de
+guardar se llaman **«Guardar la ficha completa»** y **«Guardar solo lo que
+cambié»**: que uno mande un reemplazo y el otro una modificación parcial es
+asunto del programa, no de quien usa el sistema.
+
+Y hay un detalle propio de este stack que se decidió aquí: **FastAPI reporta
+sus errores de validación en inglés** («String should have at least 1
+character»). Eso está bien en la documentación de la API y está mal delante
+de un usuario, así que el front los traduce, en un solo sitio
+(`cliente_api.py`). Traducir es trabajo de la capa de presentación: la misma
+API podría atender mañana a un cliente en otro idioma.
+
 ## Artículo 2 — Stack: Python y FastAPI, con el SQL a la vista
 
 - Lenguaje **Python 3.12** sobre **FastAPI**: controladores con
@@ -169,7 +237,7 @@ un 404 o un 422 tienen su formato exacto documentado.
 | Cosa | Convención |
 |---|---|
 | Nombres de contenedor | Llevan el prefijo `paradigmas-mapa-`: los nombres, como los puertos, **no se repiten** entre proyectos |
-| Puertos del proyecto | API **8031** · PostgreSQL **15460** · (reservado: front **8077** para la v4) |
+| Puertos del proyecto | front **8079** · API **8031** · PostgreSQL **15460** |
 | Base de datos | `mapa_local` |
 | Rutas | `/` (diagnóstico) · `/docs` (documentación interactiva) · `/api/{tabla}` |
 | Nombres | snake_case en español; interfaces con prefijo `I`; carpetas `controllers/ models/ models/ servicios/ repositorios/ excepciones/ pruebas/` (`models/` = clases entidad; `models/` = el cuerpo de cada verbo) |

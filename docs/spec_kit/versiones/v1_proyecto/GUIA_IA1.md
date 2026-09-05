@@ -214,3 +214,61 @@ Tres cosas que conviene vigilar desde el primer archivo:
 
 Las tres están decididas en las Clarificaciones. Si la IA propone otra
 cosa, no está mejorando: está ignorando la spec.
+
+---
+
+## La otra mitad: el FRONT
+
+Todo lo anterior construye la API. **La versión no está cerrada sin su
+pantalla** (Artículo 1.1), y esto es lo que hay que agregarle al prompt.
+
+```text
+9. LA VERSIÓN INCLUYE SU PANTALLA, y es la mitad del trabajo, no un añadido.
+   Un FRONT en FLASK + JINJA2 (Python 3.12), en su propia aplicación y en su
+   propio contenedor, publicando el puerto 8079:
+
+   · una pantalla por recurso, con DIRECCIÓN PROPIA (/proyectos), nunca una ruta
+     con el nombre de la tabla como parámetro;
+   · una FUNCIÓN POR OPERACIÓN —listar_proyectos, crear_proyecto, …—, nunca un
+     cliente genérico con la tabla como parámetro;
+   · la pantalla NO le habla al usuario en jerga: ni PUT, ni PATCH, ni 422, ni
+     rutas de la API. Los dos botones de guardar se llaman "Guardar la ficha
+     completa" y "Guardar solo lo que cambié";
+   · TRADUCE los errores de la API. FastAPI los devuelve en inglés y con el
+     nombre de la columna ("nombre: String should have at least 1 character").
+     Eso no se le muestra a un usuario: se traduce, y en un solo sitio;
+   · un error de la API NO borra lo que la persona había escrito;
+   · y sin filas, un recuadro que diga que todavía no hay ninguna: vacío no es
+     error.
+
+   CUATRO COSAS QUE VAS A QUERER HACER Y NO DEBES:
+
+   a) Servir las páginas desde la misma API con Jinja. NO: son dos procesos, y
+      hay que poder demostrarlo apagando uno.
+   b) Un cliente genérico. NO: una función por operación y por recurso.
+   c) Meter Bootstrap o cualquier biblioteca por CDN. NO: el CSS va escrito a
+      mano. Un front que necesita internet para verse bien no arranca en un
+      salón sin red.
+   d) Y NO compartas código entre la API y el front. Las dos están en Python
+      y en carpetas vecinas, así que un sys.path.append("../api_mapa") o un
+      "from api_mapa.models import ..." FUNCIONARÍA. Está prohibido: son dos
+      procesos, y lo único que comparten es el JSON. El front trabaja con
+      diccionarios, no con los modelos de la API.
+      Que aquí sí se pueda y no se haga es el punto: una separación que el
+      lenguaje impide se cumple sola; ésta hay que sostenerla.
+
+Y hay un criterio que se comprueba apagando un contenedor: con la API apagada,
+la pantalla tiene que SEGUIR RESPONDIENDO, con su menú y su aviso, y SIN UN
+SOLO DATO. Si sigue mostrando las filas, el front está leyendo de donde no
+debe.
+```
+
+### Lo que la IA propone con más naturalidad, y está mal
+
+| Qué | Por qué pasa | Qué revisar |
+|---|---|---|
+| **Un cliente genérico** | Es más corto, y con una sola tabla ni se nota | ¿Las funciones se llaman `listar_proyectos` o `listar(recurso)`? |
+| **Bootstrap por CDN** | Es lo que hace todo el mundo | ¿`templates/base.html` tiene un `<link>` a un dominio externo? |
+| **Tratar el 204 como error** | Un 204 no trae cuerpo, y el código que espera JSON revienta | ¿Qué muestra la pantalla con la tabla vacía? Debe decir «todavía no hay», no dar error |
+| **Dejar el error de Pydantic en inglés** | Llega así de la API y «se entiende» | ¿Qué frase sale al dejar un campo obligatorio vacío? Tiene que estar en español y con el nombre de la etiqueta |
+| **Importar los modelos de la API** | Están ahí al lado y ahorra escribirlos | ¿Hay algún `sys.path.append` o un `from api_mapa…` en el front? |

@@ -117,3 +117,23 @@ docker compose start postgres
 - [ ] [9_checklist.md](9_checklist.md) firmada.
 - [ ] La colección de Postman y el README.
 - [ ] Commit y **tag `v1`**.
+
+---
+
+## Fase — El front
+
+| # | Qué | Dónde |
+|---|---|---|
+| 1 | `cliente_api.py`: seis funciones, una por operación | `front_flask/cliente_api.py` |
+| 2 | La forma `(ok, datos, errores)`, para que las plantillas no vean códigos de estado | `front_flask/cliente_api.py` |
+| 3 | La traducción del error **al español**: el 422 de Pydantic llega en inglés | `front_flask/cliente_api.py` |
+| 4 | Las vistas: listado, formulario y retirar | `front_flask/app.py` |
+| 5 | El marco y el menú, con **un enlace por pantalla** | `templates/base.html` |
+| 6 | El listado y el formulario, con los **dos botones** de guardar | `templates/proyectos/` |
+| 7 | Los estilos, escritos a mano | `static/estilos.css` |
+| 8 | El servicio en el compose, en el **8079**, sin `depends_on: postgres` | `docker-compose.yml` |
+| 9 | La prueba de humo del front | `pruebas_humo/humo_front.py` |
+
+**Verificación de la fase:** `python pruebas_humo/humo_front.py` termina en
+verde, y con `docker compose stop api-mapa` la pantalla sigue
+respondiendo sin datos.

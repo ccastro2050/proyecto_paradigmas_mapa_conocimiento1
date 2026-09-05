@@ -92,3 +92,40 @@ sección conserva los smokes de las versiones cerradas.
 | El presupuesto vuelve entre comillas | Se declaró como texto en el modelo: debe ser `double` |
 | Un inactivo aparece en el listado | A alguna consulta le falta `WHERE activo = TRUE` |
 | `bad interpreter: /bin/bash^M` | `db/init.sh` con finales de línea de Windows (`.gitattributes`) |
+
+---
+
+## La pantalla
+
+```powershell
+python pruebas_humo/humo_front.py
+```
+
+Recorre todo: que cada pantalla responda por su dirección, que la hoja de
+estilos llegue, que no haya jerga, el ciclo completo con los dos botones de
+guardar, y **la prueba de apagar la API**.
+
+> Con formularios corrientes el guion llega hasta el final: cada botón manda
+> un POST que se puede enviar desde fuera del navegador. Lo que no puede
+> juzgar es si la pantalla **se entiende** — eso es el recorrido a mano.
+
+### A mano, que es lo que un guion no ve
+
+1. Abra <http://localhost:8079> y use el sistema: agregue una
+   ficha, edítela con los dos botones, retírela.
+2. **Los dos botones.** Entre a editar y borre un campo obligatorio:
+   - con **«Guardar la ficha completa»** → lo rechaza, y el motivo está en
+     español;
+   - con **«Guardar solo lo que cambié»**, dejando solo otro campo → guarda,
+     y lo que no envió **no se borró**.
+3. **La prueba de los dos procesos.** Con la base de datos encendida, apague
+   solo la API:
+
+   ```powershell
+   docker compose stop api-mapa
+   ```
+
+   Refresque. La pantalla sigue en pie, con su menú y un aviso de que el
+   servicio no está disponible — **y sin una sola fila**. Los datos siguen
+   ahí, a un puerto de distancia; si aparecieran, sería porque el front llegó
+   a la base por su cuenta.

@@ -178,3 +178,47 @@ DELETE /api/proyecto/9001                      ← segunda vez: ya está inactiv
 
 **La fila no se borra:** queda con `activo = FALSE`. El listado **vuelve a
 responder 204** y la fila sigue en la base — es el criterio 5.
+
+---
+
+## El contrato de la PANTALLA
+
+Lo anterior es el contrato de la API con **cualquiera** que la consuma. Este es
+el de la pantalla con **quien la usa**: son dos contratos distintos, porque el
+front es *un* cliente de la API, no *el* cliente.
+
+| Pantalla | Dirección | Qué ofrece |
+|---|---|---|
+| Inicio | <http://localhost:8079/> | La entrada, con el enlace |
+| Proyectos | <http://localhost:8079/proyectos> | La tabla, «Agregar», «Editar» y «Retirar» |
+
+**Cada pantalla tiene dirección propia**, no una con el nombre de la tabla como
+parámetro (sección 6.1 de la metodología). Se puede guardar como marcador,
+poner en el menú y mandar por correo.
+
+### Qué pantalla llama a qué endpoint
+
+| Lo que hace el usuario | Lo que manda el front |
+|---|---|
+| Abrir la pantalla | `GET /api/proyecto?limite=1000` |
+| «Agregar» y guardar | `POST /api/proyecto` |
+| «Guardar la ficha completa» | `PUT /api/proyecto/{llave}` |
+| «Guardar solo lo que cambié» | `PATCH /api/proyecto/{llave}` con **solo** lo diligenciado |
+| «Retirar», tras confirmar | `DELETE /api/proyecto/{llave}` |
+
+### Cómo traduce el front los errores
+
+El front **no repite** ninguna validación de la API: manda, y muestra lo que
+vuelva.
+
+| Lo que responde la API | Lo que ve el usuario |
+|---|---|
+| `200` con `{tabla, limite, total, datos}` | La tabla llena |
+| **`204`** (tabla vacía) | «Todavía no hay…» y el botón de agregar — **no es un error** |
+| `404` | El aviso, en español |
+| **`422` de Pydantic**, en inglés | **Traducido**: «Nombre no puede quedar vacío.» |
+| **Nada** (la API no responde) | «El servicio no está disponible» — y la pantalla sigue en pie |
+
+Las dos filas en negrita son las que se equivocan casi siempre: un 204 no es
+un fallo, y un mensaje en inglés con el nombre de la columna no es algo que
+se le pueda mostrar a un usuario.

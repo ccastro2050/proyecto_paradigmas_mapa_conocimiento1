@@ -90,3 +90,15 @@
 | **Fecha** | |
 | **Casillas en rojo** | |
 | **Veredicto** | ⬜ En verde: puede empezar el código · ⬜ En rojo: vuelve a la spec |
+
+- [ ] **La versión incluye su front**, y está especificado: hay requisitos de
+      lo que la persona ve y hace, no solo endpoints (Artículo 1.1).
+- [ ] Está dicho **qué hace la pantalla cuando la API no responde**.
+- [ ] Está dicho **qué hace la pantalla cuando no hay filas**, y que eso no
+      es un error.
+- [ ] Está escrito que el front **no comparte código** con la API, y por qué
+      — sabiendo que en este módulo sí podría.
+- [ ] El front tiene **una función por operación y por recurso**, no una
+      genérica con el nombre de la tabla como parámetro.
+- [ ] Los errores que la API devuelve en inglés **se traducen antes de
+      mostrarse**, y en un solo sitio.

@@ -54,5 +54,30 @@ services:
       postgres:
         condition: service_healthy
 
+  # --- El FRONT: Flask + Jinja2 ---
+  #
+  # LA API DE ESTE MÓDULO TAMBIÉN ESTÁ EN PYTHON, y por eso la separación hay
+  # que sostenerla a pulso: nada impide, salvo la disciplina, importar el
+  # código de la API desde el front. Este servicio la hace cumplir por donde
+  # sí se puede — no recibe las credenciales de la base ni depende de ella —
+  # y su imagen ni siquiera instala el driver de PostgreSQL.
+  front-flask:
+    build: ./front_flask
+    container_name: paradigmas-mapa-front
+    restart: unless-stopped
+    ports:
+      - "8079:8079"           # http://localhost:8079
+    volumes:
+      - ./front_flask:/app        # el código montado: guardar un .py recarga solo
+    environment:
+      # El NOMBRE del servicio, no localhost: dentro del contenedor del front,
+      # localhost sería el front mismo.
+      - URL_API_MAPA=http://api-mapa:8031
+    depends_on:
+      - api-mapa
+      # NO depende de postgres, y eso no es un olvido: el front no tiene nada
+      # que hacer con la base. Si algún día necesitara esa dependencia, sería
+      # la señal de que alguien rompió la arquitectura.
+
 volumes:
   pgdata:                     # la "memoria" de la base entre reinicios

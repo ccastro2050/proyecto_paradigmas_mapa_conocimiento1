@@ -164,3 +164,53 @@ día que entre un segundo, **este archivo es el único que cambia**.
 | 10 — Convenciones fijas | ✅ | La ruta nombra la tabla; el JSON usa `snake_case` |
 
 **Ningún artículo obliga a cambiar el plan.** La compuerta pasa.
+
+---
+
+## El stack del FRONT
+
+| Pieza | Elección | Por qué |
+|---|---|---|
+| Front | **Flask 3 + Jinja2**, Python 3.12 | La plantilla se renderiza **en el servidor** y el navegador recibe HTML ya armado: quien llama a la API es el proceso del front, no el navegador |
+| Cómo habla con la API | **`requests`** y JSON, nada más | Sin biblioteca compartida, sin `import` de la API, sin paquete común |
+| Estilos | **CSS escrito a mano** | Cero dependencias. Un front que necesita internet para verse bien no arranca en un salón sin red |
+| Puerto | **8079** | Registrado en `PUERTOS.md`, sin chocar con nadie |
+
+> **Aquí la separación hay que cuidarla, porque nada la impone.** La API está
+> en Python y el front también: un `sys.path.append("../api_mapa")` bastaría para
+> importar sus modelos, y funcionaría.
+>
+> Por eso lo que se verifica no es el lenguaje, sino tres hechos: el front no
+> tiene el driver de PostgreSQL, su servicio no depende de la base, y con la
+> API apagada la pantalla queda en pie sin un solo dato.
+
+**Una función por operación, no una genérica.** `cliente_api.py` tiene seis
+funciones con nombre —`listar_proyectos`, `obtener_proyecto`, `crear_proyecto`,
+`reemplazar_proyecto`, `actualizar_proyecto`, `eliminar_proyecto`— y sabe de una sola tabla.
+Cuando lleguen más recursos habrá más funciones, no un `listar(recurso)`: es
+la sección 6.1 de la metodología del curso, aplicada del lado del front.
+
+**Y una pieza que este stack sí necesita:** FastAPI reporta sus errores de
+validación en inglés y con el nombre de la columna. Eso está bien en la
+documentación de la API y está mal delante de un usuario, así que
+`cliente_api.py` los traduce, en un solo sitio.
+
+### Las carpetas del front
+
+```
+front_flask/
+├── app.py                       las vistas: ruta → pantalla. Nada más
+├── cliente_api.py               la capa de datos del front: lo ÚNICO que habla HTTP
+├── requirements.txt             Flask y requests. NO hay driver de base de datos
+├── Dockerfile                   python:3.12-slim, sin asyncpg
+├── templates/
+│   ├── base.html                el marco y el menú
+│   ├── inicio.html
+│   └── proyectos/               lista.html y formulario.html
+└── static/estilos.css           los estilos, escritos a mano
+```
+
+**Que en el `requirements.txt` no aparezca `asyncpg` no es un olvido: es la
+comprobación** de que este proceso no puede llegar a PostgreSQL ni queriendo.
+Son dos líneas —`flask` y `requests`— y las dos que faltan dicen más que las
+dos que están.
